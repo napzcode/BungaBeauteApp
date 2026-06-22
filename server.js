@@ -8,33 +8,37 @@ app.use(cors());
 app.use(express.json());
 app.use(express.static('public'));
 
-// PostgreSQL connection pool
 const pool = new Pool({
     connectionString: process.env.DATABASE_URL,
-    ssl: process.env.DATABASE_URL
-        ? { rejectUnauthorized: false }
-        : false
+    ssl: { rejectUnauthorized: false }
 });
 
-// Root route: arahkan customer ke form booking
+// Customer landing page
 app.get('/', (req, res) => {
     res.redirect('/booking.html');
 });
 
+// Login admin
 app.post('/api/login', (req, res) => {
     const { username, password } = req.body;
-    if (username === 'admin' && password === 'bunga123') res.json({ success: true });
-    else res.status(401).json({ success: false, message: 'Username/Password salah!' });
+    if (username === 'admin' && password === 'bunga123') {
+        res.json({ success: true });
+    } else {
+        res.status(401).json({ success: false, message: 'Username/Password salah!' });
+    }
 });
 
+// Daftar layanan
 app.get('/api/layanan', async (req, res) => {
     try {
         const result = await pool.query('SELECT * FROM layanan');
         res.json(result.rows);
-    } catch (err) { res.status(500).send(err.message); }
+    } catch (err) {
+        res.status(500).send(err.message);
+    }
 });
 
-// Perhitungan Keuangan Dipisah agar tidak Minus / Duplikat
+// Dashboard
 app.get('/api/dashboard', async (req, res) => {
     try {
         const total = await pool.query(`
@@ -62,7 +66,6 @@ app.get('/api/dashboard', async (req, res) => {
             LIMIT 5
         `);
 
-        // Hitung DP dari tabel utama
         const totalDpQuery = await pool.query(`
             SELECT COALESCE(SUM(dp_dibayar), 0) as total_dp 
             FROM booking 
@@ -70,7 +73,6 @@ app.get('/api/dashboard', async (req, res) => {
             AND EXTRACT(YEAR FROM tgl_acara) = EXTRACT(YEAR FROM CURRENT_DATE)
         `);
 
-        // Hitung Omset dari tabel detail
         const totalOmsetQuery = await pool.query(`
             SELECT COALESCE(SUM(db.harga_deal), 0) as total_omset 
             FROM booking b 
@@ -90,16 +92,22 @@ app.get('/api/dashboard', async (req, res) => {
             dp_masuk: dpMasuk,
             sisa_pelunasan: sisa < 0 ? 0 : sisa
         });
-    } catch (err) { res.status(500).send(err.message); }
+    } catch (err) {
+        res.status(500).send(err.message);
+    }
 });
 
+// Data klien
 app.get('/api/klien', async (req, res) => {
     try {
         const result = await pool.query('SELECT * FROM klien ORDER BY id_klien DESC');
         res.json(result.rows);
-    } catch (err) { res.status(500).send(err.message); }
+    } catch (err) {
+        res.status(500).send(err.message);
+    }
 });
 
+// Laporan transaksi
 app.get('/api/laporan', async (req, res) => {
     try {
         const result = await pool.query(`
@@ -112,9 +120,12 @@ app.get('/api/laporan', async (req, res) => {
             ORDER BY b.tgl_acara DESC
         `);
         res.json(result.rows);
-    } catch (err) { res.status(500).send(err.message); }
+    } catch (err) {
+        res.status(500).send(err.message);
+    }
 });
 
+// Update status pembayaran
 app.put('/api/transaksi/:id', async (req, res) => {
     const { dp_baru, status_baru } = req.body;
     try {
@@ -123,9 +134,12 @@ app.put('/api/transaksi/:id', async (req, res) => {
             [parseFloat(dp_baru), status_baru, req.params.id]
         );
         res.json({ success: true });
-    } catch (err) { res.status(500).json({ success: false }); }
+    } catch (err) {
+        res.status(500).json({ success: false });
+    }
 });
 
+// Submit booking baru
 app.post('/api/booking', async (req, res) => {
     const { nama_lengkap, no_whatsapp, tgl_acara, waktu_acara, lokasi_acara, rombongan, metode_pembayaran } = req.body;
     const client = await pool.connect();
@@ -163,5 +177,5 @@ app.post('/api/booking', async (req, res) => {
     }
 });
 
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 8080;
 app.listen(PORT, () => console.log(`Server berjalan di port ${PORT}`));
