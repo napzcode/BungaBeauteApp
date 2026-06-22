@@ -11,12 +11,17 @@ app.use(express.static('public'));
 // PostgreSQL connection pool
 const pool = new Pool({
     connectionString: process.env.DATABASE_URL,
-    ssl: process.env.DATABASE_URL && process.env.DATABASE_URL.includes('railway')
+    ssl: process.env.DATABASE_URL
         ? { rejectUnauthorized: false }
         : false
 });
 
-app.post('/api/login', (req, res) => {
+// Root route: arahkan customer ke form booking
+app.get('/', (req, res) => {
+    res.redirect('/booking.html');
+});
+
+
     const { username, password } = req.body;
     if (username === 'admin' && password === 'bunga123') res.json({ success: true });
     else res.status(401).json({ success: false, message: 'Username/Password salah!' });
@@ -158,4 +163,5 @@ app.post('/api/booking', async (req, res) => {
     }
 });
 
-app.listen(process.env.PORT || 3000, () => console.log('Server berjalan di port 3000'));
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => console.log(`Server berjalan di port ${PORT}`));
