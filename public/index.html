@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard | Bunga Beauté</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div class="sidebar">
+        <img src="logo.jpg" alt="Logo" class="sidebar-logo">
+        <h2>Bunga Beauté</h2>
+        <a class="tab-link active" onclick="bukaTab(event, 'tab-dashboard')">🏠 Dashboard</a>
+        <a href="booking.html" target="_blank">📝 Form Booking (Klien)</a>
+        <a class="tab-link" onclick="bukaTab(event, 'tab-klien')">👥 Data Klien</a>
+        <a class="tab-link" onclick="bukaTab(event, 'tab-pricelist')">📋 Price List</a>
+        <a class="tab-link" onclick="bukaTab(event, 'tab-laporan')">📊 Kelola Transaksi</a>
+        <a onclick="logout()" class="logout-btn">🚪 Logout</a>
+    </div>
+
+    <div class="main-content">
+        <div class="topbar">
+            <span id="notifBadge" style="display: none; background: #e74c3c; color: white; padding: 5px 15px; border-radius: 20px; font-weight: bold; margin-right: 20px; font-size: 14px; cursor: pointer; animation: fadeIn 0.5s infinite alternate;">
+                🔔 Ada Booking Baru! (Klik untuk menutup)
+            </span>
+            <span>👤 <strong>Admin Bunga</strong></span>
+        </div>
+
+        <div id="tab-dashboard" class="tab-content active-tab">
+            <h1 class="welcome-text">Selamat Datang, Admin Bunga</h1>
+            <div class="dashboard-grid">
+                
+                <div class="card">
+                    <h3>📅 Jadwal Hari Ini</h3>
+                    <div id="kontenJadwalHariIni">
+                        <div style="color: #888; font-style: italic; padding: 15px 2px; font-size: 15px;">⏳ Memuat jadwal...</div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h3>📈 Total Booking (Bulan Ini)</h3>
+                    <h2 id="jmlBooking" style="font-size: 48px; margin: 10px 0;">0</h2>
+                </div>
+                
+                <div class="card">
+                    <h3>💰 Keuangan (Bulan Ini)</h3>
+                    <div class="pie-chart-container">
+                        <div class="pie-chart"></div>
+                        <ul class="chart-legend">
+                            <li class="text-green">DP Masuk: <br><span id="txtDp">Rp 0</span></li>
+                            <li class="text-pink">Sisa: <br><span id="txtSisa">Rp 0</span></li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <h3>🕒 5 Booking Terakhir</h3>
+                    <table>
+                        <thead><tr><th>Klien</th><th>Layanan</th><th>Tanggal</th><th>Waktu</th></tr></thead>
+                        <tbody id="tabelRecent"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div id="tab-klien" class="tab-content">
+            <h1 class="welcome-text">👥 Manajemen Data Klien</h1>
+            <div class="table-container">
+                <table>
+                    <thead><tr><th>ID</th><th>Nama Klien</th><th>No. WhatsApp</th></tr></thead>
+                    <tbody id="tabelKlien"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <div id="tab-pricelist" class="tab-content">
+            <h1 class="welcome-text">📋 Katalog Price List</h1>
+            <div class="table-container">
+                <table>
+                    <thead><tr><th>ID</th><th>Nama Layanan</th><th>Kategori</th><th>Harga</th></tr></thead>
+                    <tbody id="tabelPriceList"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <div id="tab-laporan" class="tab-content">
+            <h1 class="welcome-text">📊 Kelola Transaksi & Pembayaran</h1>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Klien Utama</th>
+                            <th>Tgl Acara</th>
+                            <th>Total Tagihan</th>
+                            <th>DP Dibayar</th>
+                            <th>Metode Bayar</th>
+                            <th>Status</th>
+                            <th>Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tabelLaporan"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div id="modalUpdate" class="modal-overlay">
+        <div class="modal-box">
+            <h3>Update Pembayaran & Status</h3>
+            <input type="hidden" id="edit-id">
+            <div class="form-group">
+                <label>Total DP yang sudah dibayar (Rp):</label>
+                <input type="number" id="edit-dp">
+            </div>
+            <div class="form-group">
+                <label>Status Transaksi / Makeup:</label>
+                <select id="edit-status">
+                    <option value="Menunggu DP">Menunggu DP</option>
+                    <option value="DP Masuk">DP Masuk (Terkonfirmasi)</option>
+                    <option value="Lunas & Selesai">Lunas & Selesai Makeup</option>
+                    <option value="Dibatalkan">Dibatalkan</option>
+                </select>
+            </div>
+            <button class="btn-simpan" onclick="simpanUpdate()">Simpan Perubahan</button>
+            <button class="btn-batal" onclick="tutupModal()">Batal</button>
+        </div>
+    </div>
+
+    <script>
+        // 1. Keamanan Login
+        if (localStorage.getItem('adminBunga_loggedIn') !== 'true') window.location.href = '/login.html';
+        function logout() { localStorage.removeItem('adminBunga_loggedIn'); window.location.href = '/login.html'; }
+
+        // 2. Fungsi Pindah Tab (SPA)
+        function bukaTab(evt, namaTab) {
+            let i, tabcontent, tablinks;
+            tabcontent = document.getElementsByClassName("tab-content");
+            for (i = 0; i < tabcontent.length; i++) tabcontent[i].style.display = "none";
+            tablinks = document.getElementsByClassName("tab-link");
+            for (i = 0; i < tablinks.length; i++) tablinks[i].className = tablinks[i].className.replace(" active", "");
+            document.getElementById(namaTab).style.display = "block";
+            evt.currentTarget.className += " active";
+        }
+
+        // 3. Ambil Semua Data dari API
+        async function muatSemuaData() {
+            try {
+                // Fetch Data Dashboard
+                const resDash = await fetch('/api/dashboard');
+                const dataDash = await resDash.json();
+                
+                document.getElementById('jmlBooking').innerText = dataDash.total_booking;
+                document.getElementById('txtDp').innerText = `Rp ${dataDash.dp_masuk.toLocaleString('id-ID')}`;
+                document.getElementById('txtSisa').innerText = `Rp ${dataDash.sisa_pelunasan.toLocaleString('id-ID')}`;
+                
+                // LOGIKA KARTU JADWAL HARI INI
+                const containerHariIni = document.getElementById('kontenJadwalHariIni');
+                containerHariIni.innerHTML = '';
+                
+                if (dataDash.today_bookings.length === 0) {
+                    containerHariIni.innerHTML = `<div style="color: #888; font-style: italic; padding: 15px 2px; font-size: 15px;">☕ Tidak ada jadwal makeup hari ini.</div>`;
+                } else {
+                    let htmlHariIni = '';
+                    let adaJadwalAktif = false;
+                    
+                    dataDash.today_bookings.forEach(b => {
+                        let jam = isNaN(new Date(b.waktu_acara).getTime()) ? b.waktu_acara.substring(11, 16) : new Date(b.waktu_acara).toISOString().substr(11, 5);
+                        
+                        if (b.status_bayar === 'Lunas & Selesai') {
+                            htmlHariIni += `<div style="margin-bottom: 12px; border-left: 4px solid #ccc; padding-left: 10px; opacity: 0.5; text-decoration: line-through;">
+                                <strong>${b.nama_lengkap}</strong><br>
+                                <span style="color: #888; font-size: 13px;">${b.nama_layanan} - Selesai ✓</span>
+                            </div>`;
+                        } else {
+                            adaJadwalAktif = true;
+                            htmlHariIni += `<div style="margin-bottom: 12px; border-left: 4px solid #5c1a26; padding-left: 10px;">
+                                <strong>${b.nama_lengkap}</strong><br>
+                                <span style="color: #666; font-size: 13px;">${b.nama_layanan} - Pukul ${jam}</span>
+                            </div>`;
+                        }
+                    });
+                    
+                    if (!adaJadwalAktif) {
+                        htmlHariIni = `<div style="color: #4CAF50; font-weight: bold; margin-bottom: 15px; font-size: 14px;">🎉 Semua jadwal hari ini telah selesai!</div>` + htmlHariIni;
+                    }
+                    containerHariIni.innerHTML = htmlHariIni;
+                }
+
+                // PERUBAHAN: Tabel 5 Booking Terakhir dengan Tanggal
+                let htmlRecent = '';
+                dataDash.recent_booking.forEach(b => {
+                    let jam = isNaN(new Date(b.waktu_acara).getTime()) ? b.waktu_acara.substring(11, 16) : new Date(b.waktu_acara).toISOString().substr(11, 5);
+                    let tgl = new Date(b.tgl_acara).toLocaleDateString('id-ID'); // Format tanggal Indonesia
+                    htmlRecent += `<tr><td>${b.nama_lengkap}</td><td>${b.nama_layanan}</td><td>${tgl}</td><td>${jam}</td></tr>`;
+                });
+                document.getElementById('tabelRecent').innerHTML = htmlRecent;
+
+                // Tab Klien
+                const resKlien = await fetch('/api/klien');
+                const dataKlien = await resKlien.json();
+                let htmlKlien = '';
+                dataKlien.forEach(k => { htmlKlien += `<tr><td>${k.id_klien}</td><td>${k.nama_lengkap}</td><td>${k.no_whatsapp}</td></tr>`; });
+                document.getElementById('tabelKlien').innerHTML = htmlKlien;
+
+                // Tab Layanan
+                const resHarga = await fetch('/api/layanan');
+                const dataHarga = await resHarga.json();
+                let htmlHarga = '';
+                dataHarga.forEach(l => { htmlHarga += `<tr><td>${l.id_layanan}</td><td>${l.nama_layanan}</td><td>${l.kategori}</td><td>Rp ${l.harga_katalog.toLocaleString('id-ID')}</td></tr>`; });
+                document.getElementById('tabelPriceList').innerHTML = htmlHarga;
+
+                // Tab Laporan
+                const resLap = await fetch('/api/laporan');
+                const dataLap = await resLap.json();
+                let htmlLap = '';
+                dataLap.forEach(lp => { 
+                    let tgl = new Date(lp.tgl_acara).toLocaleDateString('id-ID');
+                    let warnaStatus = lp.status_bayar === 'Lunas & Selesai' ? 'green' : (lp.status_bayar === 'Menunggu DP' ? 'red' : 'orange');
+                    let metode = lp.metode_pembayaran || 'Belum Pilih';
+
+                    htmlLap += `<tr>
+                        <td><strong>${lp.nama_lengkap}</strong></td>
+                        <td>${tgl}</td>
+                        <td>Rp ${lp.total_tagihan.toLocaleString('id-ID')}</td>
+                        <td>Rp ${lp.dp_dibayar.toLocaleString('id-ID')}</td>
+                        <td>${metode}</td>
+                        <td style="color:${warnaStatus}; font-weight:bold;">${lp.status_bayar}</td>
+                        <td>
+                            <button class="btn-edit" onclick="bukaModal(${lp.id_booking}, ${lp.dp_dibayar}, '${lp.status_bayar}')">Kelola</button>
+                        </td>
+                    </tr>`; 
+                });
+                document.getElementById('tabelLaporan').innerHTML = htmlLap;
+
+            } catch (err) { console.error('Gagal muat data:', err); }
+        }
+
+        // 4. Fungsi Modal Update Status
+        function bukaModal(id, dp, status) {
+            document.getElementById('edit-id').value = id;
+            document.getElementById('edit-dp').value = dp;
+            document.getElementById('edit-status').value = status;
+            document.getElementById('modalUpdate').style.display = 'flex';
+        }
+
+        function tutupModal() { document.getElementById('modalUpdate').style.display = 'none'; }
+
+        async function simpanUpdate() {
+            const id = document.getElementById('edit-id').value;
+            const dpBaru = document.getElementById('edit-dp').value;
+            const statusBaru = document.getElementById('edit-status').value;
+            try {
+                const res = await fetch(`/api/transaksi/${id}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ dp_baru: dpBaru, status_baru: statusBaru })
+                });
+                const result = await res.json();
+                if(result.success) { alert('Berhasil memperbarui data!'); tutupModal(); muatSemuaData(); }
+                else { alert('Gagal update database.'); }
+            } catch (error) { alert('Terjadi kesalahan sistem.'); }
+        }
+
+        // 5. FITUR RADAR NOTIFIKASI LIVE POLLING
+        let jumlahBookingTerakhir = 0;
+        let statusAwal = true;
+
+        async function cekNotifikasiLive() {
+            try {
+                const res = await fetch('/api/dashboard');
+                const data = await res.json();
+                
+                if (statusAwal) {
+                    jumlahBookingTerakhir = data.total_booking;
+                    statusAwal = false;
+                } 
+                else if (data.total_booking > jumlahBookingTerakhir) {
+                    document.getElementById('notifBadge').style.display = 'inline-block';
+                    jumlahBookingTerakhir = data.total_booking;
+                    muatSemuaData(); // Otomatis refresh data di layar
+                }
+            } catch (err) {}
+        }
+
+        // Mengecek database setiap 10 detik
+        setInterval(cekNotifikasiLive, 10000);
+
+        // Menutup notifikasi saat di-klik
+        document.getElementById('notifBadge').addEventListener('click', function() {
+            this.style.display = 'none';
+        });
+
+        // 6. Jalankan pemuatan data saat halaman pertama kali dibuka
+        window.onload = muatSemuaData;
+    </script>
+</body>
+</html>

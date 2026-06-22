@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reservasi | Bunga Beauté</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #fcf4f4; margin: 0; padding: 0; color: #444; }
+        .header-banner { background: linear-gradient(135deg, #5c1a26 0%, #8a2b3d 100%); color: white; text-align: center; padding: 50px 20px 70px; border-bottom-left-radius: 30px; border-bottom-right-radius: 30px; box-shadow: 0 4px 15px rgba(92, 26, 38, 0.2); }
+        .logo-img { width: 120px; height: 120px; object-fit: cover; border-radius: 50%; border: 3px solid #e0acb5; box-shadow: 0 4px 15px rgba(0,0,0,0.4); margin-bottom: 15px; }
+        .header-banner h1 { font-family: 'Georgia', serif; font-size: 42px; margin: 0; letter-spacing: 2px; text-shadow: 2px 2px 4px rgba(0,0,0,0.3); }
+        .header-banner p { font-size: 16px; font-style: italic; opacity: 0.9; margin-top: 10px; letter-spacing: 1px; }
+        .booking-container { max-width: 650px; margin: -40px auto 50px; background: white; padding: 40px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.08); position: relative; }
+        .section-title { color: #5c1a26; font-family: 'Georgia', serif; font-size: 20px; border-bottom: 2px solid #f7dadd; padding-bottom: 10px; margin-top: 35px; margin-bottom: 20px; }
+        .section-title:first-child { margin-top: 0; }
+        .form-group { margin-bottom: 20px; }
+        label { font-weight: 600; display: block; margin-bottom: 8px; color: #555; font-size: 14px; }
+        input, select { width: 100%; padding: 14px; border: 1px solid #e0acb5; border-radius: 10px; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; font-size: 15px; background-color: #fffafa; transition: 0.3s; }
+        input:focus, select:focus { outline: none; border-color: #5c1a26; box-shadow: 0 0 8px rgba(92, 26, 38, 0.15); background-color: white; }
+        .row-rombongan { background-color: #fffafa; border: 1px solid #f7dadd; padding: 20px; border-radius: 12px; margin-bottom: 15px; }
+        .btn-tambah { background: #fdf5f6; color: #5c1a26; border: 2px dashed #e0acb5; padding: 12px; border-radius: 10px; cursor: pointer; width: 100%; font-weight: bold; margin-bottom: 15px; transition: 0.3s; font-size: 15px; }
+        .btn-tambah:hover { background: #f7dadd; border-style: solid; }
+        .btn-hapus { background: #ff4d4d; color: white; border: none; padding: 8px 15px; border-radius: 6px; cursor: pointer; margin-top: 10px; font-size: 13px; font-weight: bold; }
+        
+        /* DESAIN KOTAK INFO KONTAK & PEMBAYARAN */
+        .info-card { background: #fdf5f6; border-left: 5px solid #5c1a26; padding: 20px; border-radius: 8px; margin-top: 20px; }
+        .info-card h4 { color: #5c1a26; margin-top: 0; margin-bottom: 10px; font-family: 'Georgia', serif; font-size: 18px; }
+        .info-card p { margin: 0 0 15px 0; font-size: 14px; line-height: 1.6; color: #444; }
+        .wa-link { display: inline-block; background-color: #25D366; color: white; padding: 10px 15px; border-radius: 8px; text-decoration: none; font-weight: bold; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        .wa-link:hover { background-color: #128C7E; }
+
+        .btn-submit { background: linear-gradient(135deg, #5c1a26 0%, #8a2b3d 100%); color: white; border: none; padding: 16px; border-radius: 10px; cursor: pointer; width: 100%; font-size: 18px; font-weight: bold; margin-top: 30px; box-shadow: 0 4px 15px rgba(92, 26, 38, 0.3); transition: 0.3s; letter-spacing: 1px; }
+        .btn-submit:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(92, 26, 38, 0.4); }
+    </style>
+</head>
+<body>
+
+    <div class="header-banner">
+        <img src="logo.jpg" alt="Logo Bunga Beaute" class="logo-img">
+        <h1>Bunga Beauté</h1>
+        <p>✨ Professional Makeup Artist • Reservasi Online ✨</p>
+    </div>
+
+    <div class="booking-container">
+        <form id="formBooking">
+            <h3 class="section-title">1. Data Pemesan Utama</h3>
+            <div class="form-group"><label>Nama Lengkap</label><input type="text" id="nama" placeholder="Masukkan nama lengkap Anda..." required></div>
+            <div class="form-group"><label>No. WhatsApp</label><input type="tel" id="wa" placeholder="Contoh: 081234567890" required></div>
+
+            <h3 class="section-title">2. Detail Acara</h3>
+            <div class="form-group"><label>Tanggal Acara</label><input type="date" id="tgl" required></div>
+            <div class="form-group"><label>Waktu Mulai Makeup (Standby)</label><input type="time" id="waktu" required></div>
+            <div class="form-group"><label>Lokasi / Alamat Lengkap</label><input type="text" id="lokasi" placeholder="Detail alamat untuk Home Service atau sebutkan Studio..." required></div>
+
+            <h3 class="section-title">3. Pilihan Layanan & Rombongan</h3>
+            <p style="font-size: 13px; color: #888; margin-bottom: 20px; line-height: 1.5;">*Jika Anda booking untuk lebih dari 1 orang, silakan klik tombol tambah di bawah.</p>
+            
+            <div id="rombonganContainer">
+                <div class="row-rombongan">
+                    <div class="form-group" style="margin-bottom: 12px;"><label>Nama Klien yang di-Makeup:</label><input type="text" class="nama-rombongan" placeholder="Nama klien..." required></div>
+                    <div class="form-group" style="margin-bottom: 0;">
+                        <label>Katalog Layanan:</label>
+                        <select class="layanan-rombongan" required><option value="">⏳ Memuat daftar layanan...</option></select>
+                    </div>
+                </div>
+            </div>
+            <button type="button" id="btnTambahOrang" class="btn-tambah">+ Tambah Orang / Layanan Lain</button>
+
+            <h3 class="section-title">4. Pembayaran & Kontak Admin</h3>
+            <div class="form-group">
+                <label>Pilih Metode Pembayaran DP / Pelunasan:</label>
+                <select id="metode_pembayaran" required>
+                    <option value="">-- Pilih Metode --</option>
+                    <option value="Transfer Bank BCA">Transfer Bank BCA</option>
+                    <option value="QRIS BungaBeaute">Scan QRIS BungaBeaute</option>
+                    <option value="Cash / Tunai di Tempat">Cash / Tunai di Tempat</option>
+                </select>
+            </div>
+
+            <div class="info-card">
+                <h4>💳 Informasi Rekening & Pembayaran</h4>
+                <p>Transfer DP/Pelunasan dapat dikirim ke:<br>
+                <strong>Rekening BANK a.n Bunga Putri Salsabilla</strong><br>
+                <em>*Barcode QRIS akan diberikan oleh Admin saat konfirmasi via WA.</em></p>
+                
+                <h4>📞 Kontak Darurat & Konfirmasi</h4>
+                <p>Jika terjadi kendala, perubahan jadwal mendadak, atau keterlambatan, mohon segera hubungi Admin kami agar bisa disesuaikan jadwalnya.</p>
+                <a href="https://wa.me/6285764642931" target="_blank" class="wa-link">📱 Chat WhatsApp Admin</a>
+            </div>
+
+            <button type="submit" class="btn-submit">Kirim Form Booking</button>
+        </form>
+    </div>
+
+    <script>
+        let opsiLayanan = ''; 
+        window.onload = async () => {
+            try {
+                const res = await fetch('/api/layanan');
+                const data = await res.json();
+                data.forEach(l => { opsiLayanan += `<option value="${l.id_layanan}" data-harga="${l.harga_katalog}">${l.nama_layanan} (${l.kategori}) - Rp ${l.harga_katalog.toLocaleString('id-ID')}</option>`; });
+                document.querySelector('.layanan-rombongan').innerHTML = '<option value="">-- Pilih Layanan Makeup --</option>' + opsiLayanan;
+            } catch (err) {}
+        };
+
+        document.getElementById('btnTambahOrang').addEventListener('click', () => {
+            const div = document.createElement('div');
+            div.className = 'row-rombongan';
+            div.innerHTML = `<div class="form-group" style="margin-bottom: 12px;"><label>Nama Klien yang di-Makeup:</label><input type="text" class="nama-rombongan" placeholder="Nama klien..." required></div><div class="form-group" style="margin-bottom: 0;"><label>Katalog Layanan:</label><select class="layanan-rombongan" required><option value="">-- Pilih Layanan Makeup --</option>${opsiLayanan}</select></div><button type="button" class="btn-hapus" onclick="this.parentElement.remove()">Hapus Baris Ini</button>`;
+            document.getElementById('rombonganContainer').appendChild(div);
+        });
+
+        document.getElementById('formBooking').addEventListener('submit', async (e) => {
+            e.preventDefault(); 
+            const btnSubmit = document.querySelector('.btn-submit');
+            btnSubmit.innerText = 'Memproses Booking...'; btnSubmit.disabled = true;
+            
+            let arrRombongan = [];
+            document.querySelectorAll('.row-rombongan').forEach(row => {
+                let nm = row.querySelector('.nama-rombongan').value;
+                let sel = row.querySelector('.layanan-rombongan');
+                let idL = sel.value; let hrg = sel.options[sel.selectedIndex].getAttribute('data-harga');
+                arrRombongan.push({ nama: nm, id_layanan: idL, harga: hrg });
+            });
+
+            const payload = {
+                nama_lengkap: document.getElementById('nama').value,
+                no_whatsapp: document.getElementById('wa').value,
+                tgl_acara: document.getElementById('tgl').value,
+                waktu_acara: document.getElementById('waktu').value,
+                lokasi_acara: document.getElementById('lokasi').value,
+                metode_pembayaran: document.getElementById('metode_pembayaran').value, // Menangkap data pembayaran
+                rombongan: arrRombongan
+            };
+
+            try {
+                const response = await fetch('/api/booking', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+                const result = await response.json();
+                if(result.success) {
+                    alert('✨ Reservasi Berhasil! ✨\\nJadwal Anda telah masuk. Silakan hubungi WA Admin untuk konfirmasi DP.');
+                    window.location.reload(); 
+                } else { alert('Gagal menyimpan booking. Hubungi admin.'); btnSubmit.innerText = 'Kirim Form Booking'; btnSubmit.disabled = false; }
+            } catch (err) { alert("Terjadi kesalahan jaringan."); btnSubmit.innerText = 'Kirim Form Booking'; btnSubmit.disabled = false; }
+        });
+    </script>
+</body>
+</html>
