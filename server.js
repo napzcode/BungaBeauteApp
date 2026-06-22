@@ -21,7 +21,7 @@ app.get('/', (req, res) => {
     res.redirect('/booking.html');
 });
 
-
+app.post('/api/login', (req, res) => {
     const { username, password } = req.body;
     if (username === 'admin' && password === 'bunga123') res.json({ success: true });
     else res.status(401).json({ success: false, message: 'Username/Password salah!' });
