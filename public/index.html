@@ -81,10 +81,13 @@
         </div>
 
         <div id="tab-pricelist" class="tab-content">
-            <h1 class="welcome-text">📋 Katalog Price List</h1>
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; flex-wrap:wrap; gap:12px;">
+                <h1 class="welcome-text" style="margin:0;">📋 Katalog Price List</h1>
+                <button class="btn-simpan" style="width:auto; margin:0; padding:10px 20px;" onclick="bukaModalLayanan()">+ Tambah Layanan</button>
+            </div>
             <div class="table-container">
                 <table>
-                    <thead><tr><th>ID</th><th>Nama Layanan</th><th>Kategori</th><th>Harga</th></tr></thead>
+                    <thead><tr><th>ID</th><th>Nama Layanan</th><th>Kategori</th><th>Harga</th><th>Aksi</th></tr></thead>
                     <tbody id="tabelPriceList"></tbody>
                 </table>
             </div>
@@ -108,6 +111,34 @@
                     <tbody id="tabelLaporan"></tbody>
                 </table>
             </div>
+        </div>
+    </div>
+
+    <!-- Modal Tambah / Edit Layanan -->
+    <div id="modalLayanan" class="modal-overlay">
+        <div class="modal-box">
+            <h3 id="modalLayananJudul">Tambah Layanan Baru</h3>
+            <input type="hidden" id="layanan-id">
+            <div class="form-group">
+                <label>Nama Layanan:</label>
+                <input type="text" id="layanan-nama" placeholder="Contoh: Makeup Wisuda">
+            </div>
+            <div class="form-group">
+                <label>Kategori:</label>
+                <select id="layanan-kategori">
+                    <option value="Bridal">Bridal</option>
+                    <option value="Graduation">Graduation</option>
+                    <option value="Party">Party</option>
+                    <option value="Special">Special</option>
+                    <option value="Add-on">Add-on</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Harga Katalog (Rp):</label>
+                <input type="text" id="layanan-harga" inputmode="numeric" placeholder="Contoh: 500.000" oninput="formatInputRupiah(this)">
+            </div>
+            <button class="btn-simpan" onclick="simpanLayanan()">Simpan</button>
+            <button class="btn-batal" onclick="tutupModalLayanan()">Batal</button>
         </div>
     </div>
 
@@ -246,7 +277,18 @@
                 const resHarga = await fetch('/api/layanan');
                 const dataHarga = await resHarga.json();
                 let htmlHarga = '';
-                dataHarga.forEach(l => { htmlHarga += `<tr><td>${l.id_layanan}</td><td>${l.nama_layanan}</td><td>${l.kategori}</td><td>${formatRupiah(l.harga_katalog)}</td></tr>`; });
+                dataHarga.forEach(l => {
+                    htmlHarga += `<tr>
+                        <td>${l.id_layanan}</td>
+                        <td>${l.nama_layanan}</td>
+                        <td>${l.kategori}</td>
+                        <td>${formatRupiah(l.harga_katalog)}</td>
+                        <td style="white-space:nowrap;">
+                            <button class="btn-edit" onclick="bukaEditLayanan(${l.id_layanan}, '${l.nama_layanan.replace(/'/g, "\\'")}', '${l.kategori}', ${l.harga_katalog})">✏️ Edit</button>
+                            <button class="btn-hapus" onclick="hapusLayanan(${l.id_layanan}, '${l.nama_layanan.replace(/'/g, "\\'")}')">🗑️ Hapus</button>
+                        </td>
+                    </tr>`;
+                });
                 document.getElementById('tabelPriceList').innerHTML = htmlHarga;
 
                 // Tab Laporan
@@ -343,6 +385,76 @@
 
         // 6. Jalankan pemuatan data saat halaman pertama kali dibuka
         window.onload = muatSemuaData;
+
+        // ========================
+        // CRUD LAYANAN / PRICE LIST
+        // ========================
+        function bukaModalLayanan() {
+            document.getElementById('modalLayananJudul').innerText = 'Tambah Layanan Baru';
+            document.getElementById('layanan-id').value = '';
+            document.getElementById('layanan-nama').value = '';
+            document.getElementById('layanan-kategori').value = 'Bridal';
+            document.getElementById('layanan-harga').value = '';
+            document.getElementById('modalLayanan').style.display = 'flex';
+        }
+
+        function bukaEditLayanan(id, nama, kategori, harga) {
+            document.getElementById('modalLayananJudul').innerText = 'Edit Layanan';
+            document.getElementById('layanan-id').value = id;
+            document.getElementById('layanan-nama').value = nama;
+            document.getElementById('layanan-kategori').value = kategori;
+            const hargaNum = Math.round(parseFloat(harga) || 0);
+            document.getElementById('layanan-harga').value = hargaNum ? hargaNum.toLocaleString('id-ID') : '';
+            document.getElementById('modalLayanan').style.display = 'flex';
+        }
+
+        function tutupModalLayanan() {
+            document.getElementById('modalLayanan').style.display = 'none';
+        }
+
+        async function simpanLayanan() {
+            const id = document.getElementById('layanan-id').value;
+            const nama = document.getElementById('layanan-nama').value.trim();
+            const kategori = document.getElementById('layanan-kategori').value;
+            const harga = document.getElementById('layanan-harga').value.replace(/\./g, '');
+
+            if (!nama || !harga) { alert('Nama layanan dan harga tidak boleh kosong.'); return; }
+
+            const body = { nama_layanan: nama, kategori, harga_katalog: harga };
+            const isEdit = id !== '';
+            const url = isEdit ? `/api/layanan/${id}` : '/api/layanan';
+            const method = isEdit ? 'PUT' : 'POST';
+
+            try {
+                const res = await fetch(url, {
+                    method,
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(body)
+                });
+                const result = await res.json();
+                if (result.success) {
+                    alert(isEdit ? 'Layanan berhasil diperbarui!' : 'Layanan baru berhasil ditambahkan!');
+                    tutupModalLayanan();
+                    muatSemuaData();
+                } else {
+                    alert('Gagal menyimpan: ' + (result.message || 'Error tidak diketahui'));
+                }
+            } catch (err) { alert('Terjadi kesalahan sistem.'); }
+        }
+
+        async function hapusLayanan(id, nama) {
+            if (!confirm(`Hapus layanan "${nama}"?\n\nLayanan yang sudah dipakai di booking tidak bisa dihapus.`)) return;
+            try {
+                const res = await fetch(`/api/layanan/${id}`, { method: 'DELETE' });
+                const result = await res.json();
+                if (result.success) {
+                    alert('Layanan berhasil dihapus.');
+                    muatSemuaData();
+                } else {
+                    alert('Tidak bisa dihapus: ' + result.message);
+                }
+            } catch (err) { alert('Terjadi kesalahan sistem.'); }
+        }
     </script>
 </body>
 </html>

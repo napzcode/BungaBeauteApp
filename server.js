@@ -31,10 +31,56 @@ app.post('/api/login', (req, res) => {
 // Daftar layanan
 app.get('/api/layanan', async (req, res) => {
     try {
-        const result = await pool.query('SELECT * FROM layanan');
+        const result = await pool.query('SELECT * FROM layanan ORDER BY id_layanan ASC');
         res.json(result.rows);
     } catch (err) {
         res.status(500).send(err.message);
+    }
+});
+
+// Tambah layanan baru
+app.post('/api/layanan', async (req, res) => {
+    const { nama_layanan, kategori, harga_katalog } = req.body;
+    try {
+        const result = await pool.query(
+            'INSERT INTO layanan (nama_layanan, kategori, harga_katalog) VALUES ($1, $2, $3) RETURNING *',
+            [nama_layanan, kategori, parseFloat(harga_katalog)]
+        );
+        res.json({ success: true, data: result.rows[0] });
+    } catch (err) {
+        res.status(500).json({ success: false, message: err.message });
+    }
+});
+
+// Edit layanan
+app.put('/api/layanan/:id', async (req, res) => {
+    const { nama_layanan, kategori, harga_katalog } = req.body;
+    try {
+        await pool.query(
+            'UPDATE layanan SET nama_layanan=$1, kategori=$2, harga_katalog=$3 WHERE id_layanan=$4',
+            [nama_layanan, kategori, parseFloat(harga_katalog), req.params.id]
+        );
+        res.json({ success: true });
+    } catch (err) {
+        res.status(500).json({ success: false, message: err.message });
+    }
+});
+
+// Hapus layanan
+app.delete('/api/layanan/:id', async (req, res) => {
+    try {
+        // Cek apakah layanan sedang dipakai di booking
+        const cek = await pool.query(
+            'SELECT COUNT(*) as jml FROM detail_booking WHERE id_layanan = $1',
+            [req.params.id]
+        );
+        if (parseInt(cek.rows[0].jml) > 0) {
+            return res.status(400).json({ success: false, message: 'Layanan ini sudah dipakai di booking, tidak bisa dihapus.' });
+        }
+        await pool.query('DELETE FROM layanan WHERE id_layanan = $1', [req.params.id]);
+        res.json({ success: true });
+    } catch (err) {
+        res.status(500).json({ success: false, message: err.message });
     }
 });
 

@@ -59,6 +59,7 @@ tbody tr:hover { background-color: #fafafa; }
 .btn-simpan { background: #5c1a26; color: white; border: none; padding: 10px 15px; border-radius: 6px; cursor: pointer; font-weight: bold; width: 100%; margin-top: 10px; }
 .btn-batal { background: #ccc; color: #333; border: none; padding: 10px 15px; border-radius: 6px; cursor: pointer; font-weight: bold; width: 100%; margin-top: 10px; }
 .btn-edit { background: #e0acb5; color: #5c1a26; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 12px; }
+.btn-hapus { background: #fce8e6; color: #c0392b; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 12px; margin-left: 6px; }
 
 /* ========================
    RESPONSIVE MOBILE
