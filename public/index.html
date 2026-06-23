@@ -125,13 +125,15 @@
             </div>
             <div class="form-group">
                 <label>Kategori:</label>
-                <select id="layanan-kategori">
+                <select id="layanan-kategori" onchange="toggleKategoriCustom(this)">
                     <option value="Bridal">Bridal</option>
                     <option value="Graduation">Graduation</option>
                     <option value="Party">Party</option>
                     <option value="Special">Special</option>
                     <option value="Add-on">Add-on</option>
+                    <option value="__custom__">+ Kategori Baru...</option>
                 </select>
+                <input type="text" id="layanan-kategori-custom" placeholder="Tulis kategori baru..." style="display:none; margin-top:8px;">
             </div>
             <div class="form-group">
                 <label>Harga Katalog (Rp):</label>
@@ -394,6 +396,8 @@
             document.getElementById('layanan-id').value = '';
             document.getElementById('layanan-nama').value = '';
             document.getElementById('layanan-kategori').value = 'Bridal';
+            document.getElementById('layanan-kategori-custom').style.display = 'none';
+            document.getElementById('layanan-kategori-custom').value = '';
             document.getElementById('layanan-harga').value = '';
             document.getElementById('modalLayanan').style.display = 'flex';
         }
@@ -402,10 +406,34 @@
             document.getElementById('modalLayananJudul').innerText = 'Edit Layanan';
             document.getElementById('layanan-id').value = id;
             document.getElementById('layanan-nama').value = nama;
-            document.getElementById('layanan-kategori').value = kategori;
+
+            // Cek apakah kategori ada di pilihan default
+            const select = document.getElementById('layanan-kategori');
+            const opsiAda = [...select.options].some(o => o.value === kategori && o.value !== '__custom__');
+            if (opsiAda) {
+                select.value = kategori;
+                document.getElementById('layanan-kategori-custom').style.display = 'none';
+                document.getElementById('layanan-kategori-custom').value = '';
+            } else {
+                select.value = '__custom__';
+                document.getElementById('layanan-kategori-custom').style.display = 'block';
+                document.getElementById('layanan-kategori-custom').value = kategori;
+            }
+
             const hargaNum = Math.round(parseFloat(harga) || 0);
             document.getElementById('layanan-harga').value = hargaNum ? hargaNum.toLocaleString('id-ID') : '';
             document.getElementById('modalLayanan').style.display = 'flex';
+        }
+
+        function toggleKategoriCustom(select) {
+            const customInput = document.getElementById('layanan-kategori-custom');
+            if (select.value === '__custom__') {
+                customInput.style.display = 'block';
+                customInput.focus();
+            } else {
+                customInput.style.display = 'none';
+                customInput.value = '';
+            }
         }
 
         function tutupModalLayanan() {
@@ -415,10 +443,15 @@
         async function simpanLayanan() {
             const id = document.getElementById('layanan-id').value;
             const nama = document.getElementById('layanan-nama').value.trim();
-            const kategori = document.getElementById('layanan-kategori').value;
+            const selectVal = document.getElementById('layanan-kategori').value;
+            const kategori = selectVal === '__custom__'
+                ? document.getElementById('layanan-kategori-custom').value.trim()
+                : selectVal;
             const harga = document.getElementById('layanan-harga').value.replace(/\./g, '');
 
-            if (!nama || !harga) { alert('Nama layanan dan harga tidak boleh kosong.'); return; }
+            if (!nama) { alert('Nama layanan tidak boleh kosong.'); return; }
+            if (!kategori) { alert('Kategori tidak boleh kosong.'); return; }
+            if (!harga) { alert('Harga tidak boleh kosong.'); return; }
 
             const body = { nama_layanan: nama, kategori, harga_katalog: harga };
             const isEdit = id !== '';
