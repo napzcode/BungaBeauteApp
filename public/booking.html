@@ -6,23 +6,80 @@
     <title>Reservasi | Bunga Beauté</title>
     <style>
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #fcf4f4; margin: 0; padding: 0; color: #444; }
-        .header-banner { background: linear-gradient(135deg, #5c1a26 0%, #8a2b3d 100%); color: white; text-align: center; padding: 50px 20px 70px; border-bottom-left-radius: 30px; border-bottom-right-radius: 30px; box-shadow: 0 4px 15px rgba(92, 26, 38, 0.2); position: relative; }
-        .header-center { display: inline-block; }
-        .logo-img { width: 120px; height: 120px; object-fit: cover; border-radius: 50%; border: 3px solid #e0acb5; box-shadow: 0 4px 15px rgba(0,0,0,0.4); margin-bottom: 15px; }
-        .header-banner h1 { font-family: 'Georgia', serif; font-size: 42px; margin: 0; letter-spacing: 2px; text-shadow: 2px 2px 4px rgba(0,0,0,0.3); }
-        .header-banner p { font-size: 16px; font-style: italic; opacity: 0.9; margin-top: 10px; letter-spacing: 1px; }
+        .header-banner { background: linear-gradient(135deg, #5c1a26 0%, #8a2b3d 100%); color: white; padding: 40px 32px 70px; border-bottom-left-radius: 30px; border-bottom-right-radius: 30px; box-shadow: 0 4px 15px rgba(92, 26, 38, 0.2); }
 
-        /* Layout header dengan kartu note di kiri & kanan */
-        .header-layout { display: flex; align-items: flex-start; justify-content: center; gap: 24px; padding: 0 20px; flex-wrap: wrap; }
-        .note-card { background: rgba(255,255,255,0.10); border: 1px solid rgba(255,255,255,0.25); border-radius: 14px; padding: 18px 20px; text-align: left; min-width: 200px; max-width: 240px; flex-shrink: 0; backdrop-filter: blur(4px); }
-        .note-card h4 { margin: 0 0 4px 0; font-family: 'Georgia', serif; font-size: 13px; letter-spacing: 1px; color: #ffe8ec; text-transform: uppercase; }
-        .note-card h5 { margin: 0 0 10px 0; font-family: 'Georgia', serif; font-size: 16px; color: #fff; border-bottom: 1px solid rgba(255,255,255,0.2); padding-bottom: 8px; }
-        .note-card ul { margin: 0; padding-left: 16px; list-style: disc; }
-        .note-card ul li { font-size: 13px; color: rgba(255,255,255,0.9); line-height: 1.7; }
+        /* Layout utama header: kiri logo, kanan dua kartu */
+        .header-layout {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 28px;
+            max-width: 960px;
+            margin: 0 auto;
+        }
 
-        @media (max-width: 700px) {
+        /* Kiri: logo + judul */
+        .header-center {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            flex-shrink: 0;
+        }
+        .logo-img { width: 110px; height: 110px; object-fit: cover; border-radius: 50%; border: 3px solid #e0acb5; box-shadow: 0 4px 15px rgba(0,0,0,0.4); margin-bottom: 12px; }
+        .header-banner h1 { font-family: 'Georgia', serif; font-size: 34px; margin: 0; letter-spacing: 2px; text-shadow: 2px 2px 4px rgba(0,0,0,0.3); }
+        .header-banner p { font-size: 14px; font-style: italic; opacity: 0.9; margin-top: 8px; letter-spacing: 1px; }
+
+        /* Kanan: dua kartu note berdampingan */
+        .notes-wrapper {
+            display: flex;
+            gap: 14px;
+            flex-shrink: 1;
+        }
+        .note-card {
+            background: rgba(255,255,255,0.10);
+            border: 1px solid rgba(255,255,255,0.22);
+            border-radius: 14px;
+            padding: 16px 18px;
+            flex: 1;
+            min-width: 170px;
+        }
+        .note-card h4 {
+            margin: 0 0 3px 0;
+            font-size: 10px;
+            letter-spacing: 1.5px;
+            color: #f5c6cc;
+            text-transform: uppercase;
+            font-family: 'Segoe UI', sans-serif;
+            font-weight: 600;
+        }
+        .note-card h5 {
+            margin: 0 0 10px 0;
+            font-family: 'Georgia', serif;
+            font-size: 15px;
+            color: #fff;
+            border-bottom: 1px solid rgba(255,255,255,0.2);
+            padding-bottom: 8px;
+        }
+        .note-card ul {
+            margin: 0;
+            padding-left: 15px;
+            list-style: disc;
+        }
+        .note-card ul li {
+            font-size: 12.5px;
+            color: rgba(255,255,255,0.88);
+            line-height: 1.75;
+        }
+
+        /* Mobile: stack vertikal */
+        @media (max-width: 680px) {
+            .header-banner { padding: 30px 18px 60px; }
             .header-layout { flex-direction: column; align-items: center; }
-            .note-card { max-width: 100%; width: 100%; }
+            .header-center { width: 100%; }
+            .header-banner h1 { font-size: 28px; }
+            .notes-wrapper { flex-direction: column; width: 100%; }
+            .note-card { min-width: unset; }
         }        .booking-container { max-width: 650px; margin: -40px auto 50px; background: white; padding: 40px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.08); position: relative; }
         .section-title { color: #5c1a26; font-family: 'Georgia', serif; font-size: 20px; border-bottom: 2px solid #f7dadd; padding-bottom: 10px; margin-top: 35px; margin-bottom: 20px; }
         .section-title:first-child { margin-top: 0; }
@@ -51,39 +108,42 @@
     <div class="header-banner">
         <div class="header-layout">
 
-            <!-- NOTE kiri: Signature Makeup -->
-            <div class="note-card">
-                <h4>NOTE</h4>
-                <h5>✨ Signature Makeup</h5>
-                <ul>
-                    <li>Basic skin prep</li>
-                    <li>Makeup semi natural / flawless &amp; long lasting</li>
-                    <li>Bulu mata</li>
-                    <li>Hijab styling simple</li>
-                    <li>Free consultation</li>
-                </ul>
-            </div>
-
-            <!-- Tengah: logo & judul -->
+            <!-- Kiri: logo + judul -->
             <div class="header-center">
                 <img src="logo.jpg" alt="Logo Bunga Beaute" class="logo-img">
                 <h1>Bunga Beauté</h1>
                 <p>✨ Professional Makeup Artist • Reservasi Online ✨</p>
             </div>
 
-            <!-- NOTE kanan: Luxury Glam -->
-            <div class="note-card">
-                <h4>NOTE</h4>
-                <h5>💎 Luxury Glam</h5>
-                <ul>
-                    <li>Premium skin prep</li>
-                    <li>Natural Makeup, Flawless &amp; long lasting</li>
-                    <li>Bulu mata premium</li>
-                    <li>Detailed contour &amp; highlight</li>
-                    <li>Soft glam finish</li>
-                    <li>Hijab styling</li>
-                    <li>Free consultation</li>
-                </ul>
+            <!-- Kanan: dua kartu note berdampingan -->
+            <div class="notes-wrapper">
+
+                <div class="note-card">
+                    <h4>NOTE</h4>
+                    <h5>✨ Signature Makeup</h5>
+                    <ul>
+                        <li>Basic skin prep</li>
+                        <li>Makeup semi natural / flawless &amp; long lasting</li>
+                        <li>Bulu mata</li>
+                        <li>Hijab styling simple</li>
+                        <li>Free consultation</li>
+                    </ul>
+                </div>
+
+                <div class="note-card">
+                    <h4>NOTE</h4>
+                    <h5>💎 Luxury Glam</h5>
+                    <ul>
+                        <li>Premium skin prep</li>
+                        <li>Natural Makeup, Flawless &amp; long lasting</li>
+                        <li>Bulu mata premium</li>
+                        <li>Detailed contour &amp; highlight</li>
+                        <li>Soft glam finish</li>
+                        <li>Hijab styling</li>
+                        <li>Free consultation</li>
+                    </ul>
+                </div>
+
             </div>
 
         </div>
