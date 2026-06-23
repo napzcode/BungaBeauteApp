@@ -143,10 +143,26 @@ app.get('/api/dashboard', async (req, res) => {
     }
 });
 
-// Data klien
+// Data klien + status booking terakhir
 app.get('/api/klien', async (req, res) => {
     try {
-        const result = await pool.query('SELECT * FROM klien ORDER BY id_klien DESC');
+        const result = await pool.query(`
+            SELECT 
+                k.id_klien,
+                k.nama_lengkap,
+                k.no_whatsapp,
+                b.tgl_acara,
+                b.status_bayar,
+                b.dp_dibayar,
+                b.id_booking
+            FROM klien k
+            LEFT JOIN booking b ON b.id_booking = (
+                SELECT id_booking FROM booking 
+                WHERE id_klien = k.id_klien 
+                ORDER BY id_booking DESC LIMIT 1
+            )
+            ORDER BY k.id_klien DESC
+        `);
         res.json(result.rows);
     } catch (err) {
         res.status(500).send(err.message);

@@ -74,7 +74,15 @@
             <h1 class="welcome-text">👥 Manajemen Data Klien</h1>
             <div class="table-container">
                 <table>
-                    <thead><tr><th>ID</th><th>Nama Klien</th><th>No. WhatsApp</th></tr></thead>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Nama Klien</th>
+                            <th>No. WhatsApp</th>
+                            <th>Tgl Acara</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
                     <tbody id="tabelKlien"></tbody>
                 </table>
             </div>
@@ -269,7 +277,37 @@
                 const resKlien = await fetch('/api/klien');
                 const dataKlien = await resKlien.json();
                 let htmlKlien = '';
-                dataKlien.forEach(k => { htmlKlien += `<tr><td>${k.id_klien}</td><td>${k.nama_lengkap}</td><td>${k.no_whatsapp}</td></tr>`; });
+                dataKlien.forEach(k => {
+                    // Tentukan badge status
+                    let badgeHtml = '<span style="color:#aaa; font-size:12px;">Belum ada booking</span>';
+                    if (k.status_bayar) {
+                        let warna, icon;
+                        if (k.status_bayar === 'Lunas & Selesai') {
+                            warna = '#27ae60'; icon = '✅';
+                        } else if (k.status_bayar === 'DP Masuk') {
+                            warna = '#e67e22'; icon = '💰';
+                        } else if (k.status_bayar === 'Menunggu DP') {
+                            warna = '#e74c3c'; icon = '⏳';
+                        } else if (k.status_bayar === 'Dibatalkan') {
+                            warna = '#95a5a6'; icon = '❌';
+                        } else {
+                            warna = '#888'; icon = '•';
+                        }
+                        badgeHtml = `<span style="background:${warna}18; color:${warna}; border:1px solid ${warna}40; padding:3px 10px; border-radius:20px; font-size:12px; font-weight:bold; white-space:nowrap;">${icon} ${k.status_bayar}</span>`;
+                    }
+
+                    const tglAcara = k.tgl_acara
+                        ? new Date(k.tgl_acara).toLocaleDateString('id-ID')
+                        : '-';
+
+                    htmlKlien += `<tr>
+                        <td>${k.id_klien}</td>
+                        <td><strong>${k.nama_lengkap}</strong></td>
+                        <td>${k.no_whatsapp}</td>
+                        <td>${tglAcara}</td>
+                        <td>${badgeHtml}</td>
+                    </tr>`;
+                });
                 document.getElementById('tabelKlien').innerHTML = htmlKlien;
 
                 // Tab Layanan
