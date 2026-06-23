@@ -138,6 +138,12 @@
         if (localStorage.getItem('adminBunga_loggedIn') !== 'true') window.location.href = '/login.html';
         function logout() { localStorage.removeItem('adminBunga_loggedIn'); window.location.href = '/login.html'; }
 
+        // Helper: format angka jadi Rupiah "Rp 3.000.000"
+        function formatRupiah(angka) {
+            const num = Math.round(parseFloat(angka) || 0);
+            return 'Rp ' + num.toLocaleString('id-ID');
+        }
+
         // Helper: parse waktu dari berbagai format PostgreSQL
         // Menerima: "07:30:00", "07:30:00.000", "2026-06-23T07:30:00.000Z", dll
         function formatWaktu(waktu) {
@@ -184,8 +190,8 @@
                 const dataDash = await resDash.json();
                 
                 document.getElementById('jmlBooking').innerText = dataDash.total_booking;
-                document.getElementById('txtDp').innerText = `Rp ${dataDash.dp_masuk.toLocaleString('id-ID')}`;
-                document.getElementById('txtSisa').innerText = `Rp ${dataDash.sisa_pelunasan.toLocaleString('id-ID')}`;
+                document.getElementById('txtDp').innerText = formatRupiah(dataDash.dp_masuk);
+                document.getElementById('txtSisa').innerText = formatRupiah(dataDash.sisa_pelunasan);
                 
                 // LOGIKA KARTU JADWAL HARI INI
                 const containerHariIni = document.getElementById('kontenJadwalHariIni');
@@ -240,7 +246,7 @@
                 const resHarga = await fetch('/api/layanan');
                 const dataHarga = await resHarga.json();
                 let htmlHarga = '';
-                dataHarga.forEach(l => { htmlHarga += `<tr><td>${l.id_layanan}</td><td>${l.nama_layanan}</td><td>${l.kategori}</td><td>Rp ${l.harga_katalog.toLocaleString('id-ID')}</td></tr>`; });
+                dataHarga.forEach(l => { htmlHarga += `<tr><td>${l.id_layanan}</td><td>${l.nama_layanan}</td><td>${l.kategori}</td><td>${formatRupiah(l.harga_katalog)}</td></tr>`; });
                 document.getElementById('tabelPriceList').innerHTML = htmlHarga;
 
                 // Tab Laporan
@@ -255,8 +261,8 @@
                     htmlLap += `<tr>
                         <td><strong>${lp.nama_lengkap}</strong></td>
                         <td>${tgl}</td>
-                        <td>Rp ${lp.total_tagihan.toLocaleString('id-ID')}</td>
-                        <td>Rp ${lp.dp_dibayar.toLocaleString('id-ID')}</td>
+                        <td>${formatRupiah(lp.total_tagihan)}</td>
+                        <td>${formatRupiah(lp.dp_dibayar)}</td>
                         <td>${metode}</td>
                         <td style="color:${warnaStatus}; font-weight:bold;">${lp.status_bayar}</td>
                         <td>
