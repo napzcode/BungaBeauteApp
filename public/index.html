@@ -8,7 +8,13 @@
 </head>
 <body>
 
-    <div class="sidebar">
+    <!-- Tombol hamburger untuk mobile -->
+    <button class="hamburger-btn" onclick="toggleSidebar()" aria-label="Buka menu">☰</button>
+
+    <!-- Overlay gelap saat sidebar terbuka -->
+    <div class="sidebar-overlay" id="sidebarOverlay" onclick="tutupSidebar()"></div>
+
+    <div class="sidebar" id="sidebar">
         <img src="logo.jpg" alt="Logo" class="sidebar-logo">
         <h2>Bunga Beauté</h2>
         <a class="tab-link active" onclick="bukaTab(event, 'tab-dashboard')">🏠 Dashboard</a>
@@ -132,6 +138,16 @@
         if (localStorage.getItem('adminBunga_loggedIn') !== 'true') window.location.href = '/login.html';
         function logout() { localStorage.removeItem('adminBunga_loggedIn'); window.location.href = '/login.html'; }
 
+        // HAMBURGER / SIDEBAR MOBILE
+        function toggleSidebar() {
+            document.getElementById('sidebar').classList.toggle('open');
+            document.getElementById('sidebarOverlay').classList.toggle('active');
+        }
+        function tutupSidebar() {
+            document.getElementById('sidebar').classList.remove('open');
+            document.getElementById('sidebarOverlay').classList.remove('active');
+        }
+
         // 2. Fungsi Pindah Tab (SPA)
         function bukaTab(evt, namaTab) {
             let i, tabcontent, tablinks;
@@ -141,6 +157,7 @@
             for (i = 0; i < tablinks.length; i++) tablinks[i].className = tablinks[i].className.replace(" active", "");
             document.getElementById(namaTab).style.display = "block";
             evt.currentTarget.className += " active";
+            tutupSidebar(); // Tutup sidebar setelah pilih menu di mobile
         }
 
         // 3. Ambil Semua Data dari API

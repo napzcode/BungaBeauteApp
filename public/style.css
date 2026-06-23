@@ -1,8 +1,9 @@
 /* Reset Dasar */
-body { margin: 0; font-family: 'Segoe UI', Tahoma, sans-serif; background-color: #fdf5f6; display: flex; height: 100vh; color: #444; overflow: hidden; }
+* { box-sizing: border-box; }
+body { margin: 0; font-family: 'Segoe UI', Tahoma, sans-serif; background-color: #fdf5f6; display: flex; min-height: 100vh; color: #444; overflow-x: hidden; }
 
 /* Sidebar & Logo */
-.sidebar { width: 260px; background-color: #ffffff; padding: 30px 20px; box-shadow: 4px 0 15px rgba(0,0,0,0.03); display: flex; flex-direction: column; z-index: 10; }
+.sidebar { width: 260px; min-width: 260px; background-color: #ffffff; padding: 30px 20px; box-shadow: 4px 0 15px rgba(0,0,0,0.06); display: flex; flex-direction: column; z-index: 200; transition: transform 0.3s ease; }
 .sidebar-logo { width: 100px; height: 100px; border-radius: 50%; object-fit: cover; border: 3px solid #e0acb5; display: block; margin: 0 auto 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
 .sidebar h2 { color: #5c1a26; font-family: 'Georgia', serif; text-align: center; margin-top: 0; margin-bottom: 30px; letter-spacing: 1px; }
 
@@ -12,10 +13,72 @@ body { margin: 0; font-family: 'Segoe UI', Tahoma, sans-serif; background-color:
 .logout-btn { margin-top: auto; color: #e74c3c !important; }
 .logout-btn:hover { background-color: #fceceb !important; }
 
+/* Tombol Hamburger (hanya mobile) */
+.hamburger-btn { display: none; position: fixed; top: 14px; left: 14px; z-index: 300; background: #5c1a26; color: white; border: none; border-radius: 8px; padding: 10px 13px; font-size: 20px; cursor: pointer; box-shadow: 0 2px 8px rgba(0,0,0,0.25); line-height: 1; }
+
+/* Overlay gelap saat sidebar terbuka di mobile */
+.sidebar-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.45); z-index: 150; }
+.sidebar-overlay.active { display: block; }
+
 /* Area Konten */
-.main-content { flex: 1; padding: 40px; overflow-y: auto; background-color: #fdf5f6; }
+.main-content { flex: 1; padding: 40px; overflow-y: auto; background-color: #fdf5f6; min-width: 0; }
 .topbar { display: flex; justify-content: flex-end; margin-bottom: 10px; }
 .welcome-text { font-family: 'Georgia', serif; color: #5c1a26; margin-bottom: 30px; font-size: 28px; }
+
+/* ========================
+   RESPONSIVE MOBILE
+   ======================== */
+@media (max-width: 768px) {
+
+    body { display: block; }
+
+    /* Sidebar jadi drawer dari kiri */
+    .sidebar {
+        position: fixed;
+        top: 0; left: 0;
+        height: 100%;
+        transform: translateX(-100%);
+        overflow-y: auto;
+        box-shadow: 4px 0 20px rgba(0,0,0,0.15);
+    }
+    .sidebar.open { transform: translateX(0); }
+
+    /* Tampilkan hamburger */
+    .hamburger-btn { display: block; }
+
+    /* Main content penuh, beri ruang atas untuk hamburger */
+    .main-content {
+        padding: 20px 16px;
+        padding-top: 64px;
+        width: 100%;
+    }
+
+    /* Topbar */
+    .topbar { justify-content: flex-end; flex-wrap: wrap; gap: 8px; }
+
+    /* Welcome text lebih kecil */
+    .welcome-text { font-size: 20px; margin-bottom: 20px; }
+
+    /* Dashboard grid jadi 1 kolom */
+    .dashboard-grid { grid-template-columns: 1fr; gap: 16px; }
+
+    /* Card padding lebih kecil */
+    .card { padding: 18px 16px; }
+
+    /* Angka booking lebih kecil */
+    #jmlBooking { font-size: 36px !important; }
+
+    /* Tabel bisa di-scroll horizontal */
+    .table-container { overflow-x: auto; padding: 16px; }
+    table { min-width: 480px; }
+    th, td { padding: 10px 8px; font-size: 13px; }
+
+    /* Modal full-width */
+    .modal-box { width: 92%; padding: 20px; }
+
+    /* Pie chart layout */
+    .pie-chart-container { flex-direction: column; gap: 15px; align-items: flex-start; }
+}
 
 /* Sistem Tab (SPA) */
 .tab-content { display: none; animation: fadeIn 0.4s; }
