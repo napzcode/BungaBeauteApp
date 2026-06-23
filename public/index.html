@@ -138,6 +138,22 @@
         if (localStorage.getItem('adminBunga_loggedIn') !== 'true') window.location.href = '/login.html';
         function logout() { localStorage.removeItem('adminBunga_loggedIn'); window.location.href = '/login.html'; }
 
+        // Helper: parse waktu dari berbagai format PostgreSQL
+        // Menerima: "07:30:00", "07:30:00.000", "2026-06-23T07:30:00.000Z", dll
+        function formatWaktu(waktu) {
+            if (!waktu) return '-';
+            // Jika format TIME biasa: "HH:MM:SS" atau "HH:MM:SS.mmm"
+            if (/^\d{2}:\d{2}/.test(waktu)) {
+                return waktu.substring(0, 5); // Ambil "HH:MM"
+            }
+            // Jika format ISO datetime
+            const d = new Date(waktu);
+            if (!isNaN(d.getTime())) {
+                return d.toISOString().substr(11, 5);
+            }
+            return '-';
+        }
+
         // HAMBURGER / SIDEBAR MOBILE
         function toggleSidebar() {
             document.getElementById('sidebar').classList.toggle('open');
@@ -182,7 +198,7 @@
                     let adaJadwalAktif = false;
                     
                     dataDash.today_bookings.forEach(b => {
-                        let jam = isNaN(new Date(b.waktu_acara).getTime()) ? b.waktu_acara.substring(11, 16) : new Date(b.waktu_acara).toISOString().substr(11, 5);
+                        let jam = formatWaktu(b.waktu_acara);
                         
                         if (b.status_bayar === 'Lunas & Selesai') {
                             htmlHariIni += `<div style="margin-bottom: 12px; border-left: 4px solid #ccc; padding-left: 10px; opacity: 0.5; text-decoration: line-through;">
@@ -207,7 +223,7 @@
                 // PERUBAHAN: Tabel 5 Booking Terakhir dengan Tanggal
                 let htmlRecent = '';
                 dataDash.recent_booking.forEach(b => {
-                    let jam = isNaN(new Date(b.waktu_acara).getTime()) ? b.waktu_acara.substring(11, 16) : new Date(b.waktu_acara).toISOString().substr(11, 5);
+                    let jam = formatWaktu(b.waktu_acara);
                     let tgl = new Date(b.tgl_acara).toLocaleDateString('id-ID'); // Format tanggal Indonesia
                     htmlRecent += `<tr><td>${b.nama_lengkap}</td><td>${b.nama_layanan}</td><td>${tgl}</td><td>${jam}</td></tr>`;
                 });
